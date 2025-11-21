@@ -98,7 +98,7 @@ stdout_lines:
 from ansible.module_utils.basic import AnsibleModule
 
 # This import relies on the wheel being present and in PYTHONNPATH, see following comment about module_utils                                                                                                                                                                                                     # type: ignore
-from module.dconcat_module import dconcat, ddiff_source, ddiff_change, data_set_print, ddiff_source_write
+from module.dconcat_module import dconcat, ddiff_source, ddiff_change, data_set_print, compare_running_log_to_previous_log
 
 # If you want to use the module utils that is included in the collection instead of the wheel, uncomment this import.
 # from ansible_collections.ddimatos.zos_modules.plugins.module_utils.dconcat_module import dconcat, ddiff_source, ddiff_change, data_set_print
@@ -149,10 +149,11 @@ def run_module():
     output = None
 
     if audit:
-        rc = ddiff_source_write(source=src, change=change, merge=merge)
+        differences_dataset=merge
+        rc = compare_running_log_to_previous_log(running_log=src, previous_log=change, differences_dataset=merge)
 
         if rc == 0:
-            output = data_set_print(source=merge)
+            output = data_set_print(source=differences_dataset)
             result['stdout'] = output
             result['stdout_lines'] = output.splitlines()
             result['rc'] = 6
