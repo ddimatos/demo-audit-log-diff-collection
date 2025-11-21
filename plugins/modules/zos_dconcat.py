@@ -138,12 +138,12 @@ def run_module():
     )
 
     # Merge overrides reverse
-    if merge is not None:
+    if state == 'audit':
+        audit = True
+    elif merge is not None:
         reverse = False
     elif state == 'reverse':
         reverse = True
-    elif state == 'audit':
-        audit = True
 
     # Perform the diff and concat via previously created Python module code
     output = None
@@ -152,10 +152,10 @@ def run_module():
         rc = ddiff_source_write(source=src, change=change, merge=merge)
 
         if rc == 0:
-            output = data_set_print(source=change)
+            output = data_set_print(source=merge)
             result['stdout'] = output
             result['stdout_lines'] = output.splitlines()
-            result['rc'] = rc
+            result['rc'] = 6
             module.exit_json(**result)
     else:
         rc = dconcat( source=src, change=change, merge=merge, reverse=state)
@@ -163,7 +163,7 @@ def run_module():
             if reverse:
                 output = data_set_print(source=change)
             elif merge is not None:
-                output = data_set_print(source=change)
+                output = data_set_print(source=merge)
             else:
                 output = data_set_print(source=src)
 
